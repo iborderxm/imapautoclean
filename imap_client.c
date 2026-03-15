@@ -189,9 +189,15 @@ int imap_connect_and_auth(tls_context_t *tls_ctx, const config_t *cfg) {
 int imap_select_folder(tls_context_t *tls_ctx, const char *folder) {
     int ret;
     char tag[16];
+    char encoded_folder[MAX_FOLDER_LEN * 2]; // 为编码后的数据预留足够空间
+    
+    // 将文件夹名称转换为IMAP UTF-7格式
+    if (utf8_to_imap_utf7(folder, encoded_folder, sizeof(encoded_folder)) != 0) {
+        return ERR_PARAM;
+    }
     
     next_tag(tag, sizeof(tag));
-    snprintf(g_cmd_buf, sizeof(g_cmd_buf), "%s SELECT \"%s\"\r\n", tag, folder);
+    snprintf(g_cmd_buf, sizeof(g_cmd_buf), "%s SELECT \"%s\"\r\n", tag, encoded_folder);
     ret = send_command(tls_ctx, g_cmd_buf);
     if (ret != ERR_OK) {
         return ret;

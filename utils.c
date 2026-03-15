@@ -176,3 +176,127 @@ const char *get_batch_file(int index) {
 void reset_batch_count(void) {
     g_batch_count = 0;
 }
+
+// ==================== 编码转换函数实现 ====================
+
+// Base64编码表
+static const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+,-";
+
+// 将UTF-8字符串编码为IMAP UTF-7格式
+int utf8_to_imap_utf7(const char *utf8, char *out, size_t out_len) {
+    if (!utf8 || !out) {
+        return -1;
+    }
+    
+    size_t pos = 0;
+    const char *p = utf8;
+    
+    while (*p && pos < out_len - 1) {
+        unsigned char c = (unsigned char)*p;
+        
+        if (c >= 0x20 && c <= 0x7e) {
+            // ASCII字符，直接复制
+            if (c == '&') {
+                // &需要特殊处理为&-
+                if (pos + 2 >= out_len) {
+                    return -1;
+                }
+                out[pos++] = '&';
+                out[pos++] = '-';
+            } else {
+                out[pos++] = c;
+            }
+            p++;
+        } else {
+            // 非ASCII字符，需要UTF-7编码
+            // 收集连续的非ASCII字符
+            const char *start = p;
+            while (*p) {
+                unsigned char ch = (unsigned char)*p;
+                if (ch >= 0x20 && ch <= 0x7e && ch != '&') {
+                    break;
+                }
+                p++;
+            }
+            
+            // 转换为UTF-16并进行Base64编码
+            const char *q = start;
+            char b64_buf[64]; // 临时Base64缓冲区
+            size_t b64_pos = 0;
+            
+            while (q < p) {
+                // 读取UTF-8字符
+                uint32_t codepoint;
+                if ((unsigned char)*q < 0x80) {
+                    codepoint = (unsigned char)*q++;
+                } else if ((unsigned char)*q < 0xe0) {
+                    codepoint = ((unsigned char)*q++ & 0x1f) << 6;
+                    codepoint |= (unsigned char)*q++ & 0x3f;
+                } else if ((unsigned char)*q < 0xf0) {
+                    codepoint = ((unsigned char)*q++ & 0x0f) << 12;
+                    codepoint |= ((unsigned char)*q++ & 0x3f) << 6;
+                    codepoint |= (unsigned char)*q++ & 0x3f;
+                } else {
+                    // 4字节UTF-8
+                    codepoint = ((unsigned char)*q++ & 0x07) << 18;
+                    codepoint |= ((unsigned char)*q++ & 0x3f) << 12;
+                    codepoint |= ((unsigned char)*q++ & 0x3f) << 6;
+                    codepoint |= (unsigned char)*q++ & 0x3f;
+                }
+                
+                // 转换为UTF-16（小端序）
+                if (codepoint <= 0xffff) {
+                    // 基本多文种平面
+                    uint16_t utf16 = (uint16_t)codepoint;
+                    b64_buf[b64_pos++] = utf16 & 0xff;
+                    b64_buf[b64_pos++] = (utf16 >> 8) & 0xff;
+                } else {
+                    // 补充平面，使用代理对
+                    codepoint -= 0x10000;
+                    uint16_t high_surrogate = 0xd800 | ((codepoint >> 10) & 0x3ff);
+                    uint16_t low_surrogate = 0xdc00 | (codepoint & 0x3ff);
+                    b64_buf[b64_pos++] = high_surrogate & 0xff;
+                    b64_buf[b64_pos++] = (high_surrogate >> 8) & 0xff;
+                    b64_buf[b64_pos++] = low_surrogate & 0xff;
+                    b64_buf[b64_pos++] = (low_surrogate >> 8) & 0xff;
+                }
+            }
+            
+            // 进行Base64编码
+            if (b64_pos > 0) {
+                if (pos + 1 >= out_len) {
+                    return -1;
+                }
+                out[pos++] = '&'; // 开始标记
+                
+                size_t i = 0;
+                while (i < b64_pos) {
+                    uint32_t value = 0;
+                    int bits = 0;
+                    
+                    for (int j = 0; j < 3 && i < b64_pos; j++) {
+                        value |= (unsigned char)b64_buf[i++] << (8 * j);
+                        bits += 8;
+                    }
+                    
+                    for (int j = 0; j < 4 && bits > 0; j++) {
+                        if (pos >= out_len - 1) {
+                            return -1;
+                        }
+                        int index = (value >> (6 * (3 - j))) & 0x3f;
+                        out[pos++] = base64_table[index];
+                        bits -= 6;
+                    }
+                }
+                
+                if (pos + 1 >= out_len) {
+                    return -1;
+                }
+                out[pos++] = '-'; // 结束标记
+            }
+        }
+    }
+    
+    out[pos] = '\0';
+    return 0;
+}

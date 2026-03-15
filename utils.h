@@ -66,4 +66,15 @@ const char *get_batch_file(int index);
 // 重置批次计数（清空所有批次记录）
 void reset_batch_count(void);
 
+// ==================== 编码转换函数 ====================
+
+// 将UTF-8字符串编码为IMAP UTF-7格式
+// 参数:
+//   utf8 - 输入的UTF-8字符串
+//   out - 输出缓冲区
+//   out_len - 输出缓冲区大小
+// 返回:
+//   成功返回0，失败返回-1
+int utf8_to_imap_utf7(const char *utf8, char *out, size_t out_len);
+
 #endif // UTILS_H
