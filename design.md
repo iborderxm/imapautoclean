@@ -153,7 +153,6 @@ CFLAGS += -Wl,--gc-sections     # 链接时移除未使用段
 CFLAGS += -Wl,--strip-all       # 去除所有符号
 CFLAGS += -Wl,-z,norelro        # 禁用RELRO（节省少量空间）
 CFLAGS += -fno-plt              # 禁用PLT（如果支持）
-CFLAGS += -mno-shared           # 优先静态链接内部代码
 ```
 
 **代码层面优化:**

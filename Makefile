@@ -33,7 +33,6 @@ CFLAGS += -fno-asynchronous-unwind-tables
 CFLAGS += -fmerge-all-constants
 CFLAGS += -fno-ident
 CFLAGS += -fno-plt
-CFLAGS += -mno-shared
 CFLAGS += -Wall -Wextra
 CFLAGS += -I. -I$(MBEDTLS_INCLUDE)
 # 追加从外部传入的额外编译选项
