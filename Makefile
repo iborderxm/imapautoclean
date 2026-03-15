@@ -38,6 +38,8 @@ CFLAGS += -fno-plt
 CFLAGS += -mno-shared
 CFLAGS += -Wall -Wextra
 CFLAGS += -I. -I$(MBEDTLS_INCLUDE)
+# 追加从外部传入的额外编译选项
+CFLAGS += $(EXTRA_CFLAGS)
 
 # ==================== 链接选项 ====================
 LDFLAGS := -Wl,--gc-sections
@@ -46,6 +48,8 @@ LDFLAGS += -Wl,-z,norelro
 LDFLAGS += -L$(MBEDTLS_LIB)
 LDFLAGS += -lmbedtls -lmbedx509 -lmbedcrypto
 LDFLAGS += -Wl,-rpath,/usr/lib
+# 追加从外部传入的额外链接选项
+LDFLAGS += $(EXTRA_LDFLAGS)
 
 .PHONY: all clean install analyze
 
