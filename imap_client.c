@@ -302,6 +302,9 @@ int imap_search_uids(tls_context_t *tls_ctx, const char *before_date,
                         }
                     }
                     uid_count++;
+                } else {
+                    // 没有解析到数字，跳过这个字符避免死循环
+                    p++;
                 }
             }
         }
