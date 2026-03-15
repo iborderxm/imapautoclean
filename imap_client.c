@@ -185,6 +185,22 @@ int imap_connect_and_auth(tls_context_t *tls_ctx, const config_t *cfg) {
         return ERR_AUTH;
     }
     
+    // ==================== 4. 发送ID命令（网易服务器要求） ====================
+    if (cfg->server && strstr(cfg->server, "163.com")) {
+        next_tag(tag, sizeof(tag));
+        snprintf(g_cmd_buf, sizeof(g_cmd_buf), "%s ID (\"name\" \"insight\" \"version\" \"1.0\" \"vendor\" \"myclient\")\r\n", tag);
+        ret = send_command(tls_ctx, g_cmd_buf);
+        if (ret != ERR_OK) {
+            tls_close(tls_ctx);
+            return ret;
+        }
+        ret = check_response(tls_ctx, tag);
+        if (ret != ERR_OK) {
+            // ID命令失败不影响后续操作，继续执行
+            printf("[10086] IMAP: ID命令响应失败，错误码: %d\n", ret);
+        }
+    }
+    
     return ERR_OK;
 }
 
