@@ -3,9 +3,9 @@
 # 用于MIPSel架构资源受限设备
 
 # ==================== 交叉编译器配置 ====================
-CC ?= ${CROSS_COMPILE}gcc
-STRIP ?= ${CROSS_COMPILE}strip
-SIZE ?= ${CROSS_COMPILE}size
+CC = mipsel-linux-gcc
+STRIP = mipsel-linux-strip
+SIZE = mipsel-linux-size
 
 # ==================== 目标与源文件 ====================
 TARGET := imap_cleaner
