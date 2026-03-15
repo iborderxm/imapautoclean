@@ -24,8 +24,6 @@ MBEDTLS_LIB := $(STAGING_DIR)/usr/lib
 
 # ==================== 编译选项 - 极致体积优化 ====================
 CFLAGS := -Os
-CFLAGS += -s
-CFLAGS += -mips32
 CFLAGS += -fno-stack-protector
 CFLAGS += -fomit-frame-pointer
 CFLAGS += -ffunction-sections

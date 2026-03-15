@@ -153,7 +153,6 @@ CFLAGS += -Wl,--gc-sections     # 链接时移除未使用段
 CFLAGS += -Wl,--strip-all       # 去除所有符号
 CFLAGS += -Wl,-z,norelro        # 禁用RELRO（节省少量空间）
 CFLAGS += -fno-plt              # 禁用PLT（如果支持）
-CFLAGS += -mips32               # MIPS32指令集
 CFLAGS += -mno-shared           # 优先静态链接内部代码
 ```
 
@@ -230,7 +229,7 @@ CFLAGS += -mno-shared           # 优先静态链接内部代码
 CC = mipsel-linux-gcc
 
 # 编译选项
-CFLAGS = -Os -s -mips32 -fno-stack-protector -fomit-frame-pointer \
+CFLAGS = -Os -fno-stack-protector -fomit-frame-pointer \
          -ffunction-sections -fdata-sections -fno-unwind-tables \
          -I. -I$(MBEDTLS_INCLUDE)
 
@@ -534,7 +533,6 @@ MBEDTLS_INCLUDE = /usr/include
 MBEDTLS_LIB = /usr/lib
 
 # 编译选项 - 极致体积优化
-CFLAGS = -Os -s -mips32
 CFLAGS += -fno-stack-protector
 CFLAGS += -fomit-frame-pointer
 CFLAGS += -ffunction-sections
