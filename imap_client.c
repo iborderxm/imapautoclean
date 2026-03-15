@@ -11,7 +11,6 @@
 // ==================== 全局静态缓冲区 ====================
 // 使用静态缓冲区避免动态内存分配
 static char g_cmd_buf[CMD_BUF_SIZE];
-static char g_resp_buf[RESP_BUF_SIZE];
 static char g_line_buf[LINE_BUF_SIZE];
 static int g_tag_seq = 0;  // IMAP命令标签序列号
 
