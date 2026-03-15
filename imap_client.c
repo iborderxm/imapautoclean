@@ -286,19 +286,23 @@ int imap_search_uids(tls_context_t *tls_ctx, const char *before_date,
                 
                 // 解析UID
                 uint32_t uid = 0;
+                char *start = p;
                 while (*p && isdigit((unsigned char)*p)) {
                     uid = uid * 10 + (*p - '0');
                     p++;
                 }
                 
-                // 调用回调函数
-                if (callback) {
-                    if (callback(uid, callback_ctx) != 0) {
-                        // 回调要求停止搜索
-                        goto cleanup;
+                // 只有当解析到有效的UID时才调用回调函数
+                if (p > start) {
+                    // 调用回调函数
+                    if (callback) {
+                        if (callback(uid, callback_ctx) != 0) {
+                            // 回调要求停止搜索
+                            goto cleanup;
+                        }
                     }
+                    uid_count++;
                 }
-                uid_count++;
             }
         }
         
