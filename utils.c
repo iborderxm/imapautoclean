@@ -180,7 +180,7 @@ void reset_batch_count(void) {
 // ==================== 编码转换函数实现 ====================
 
 // Base64编码表
-static const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+,-";
+static const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+,";
 
 // 将UTF-8字符串编码为IMAP UTF-7格式
 int utf8_to_imap_utf7(const char *utf8, char *out, size_t out_len) {
@@ -244,21 +244,21 @@ int utf8_to_imap_utf7(const char *utf8, char *out, size_t out_len) {
                     codepoint |= (unsigned char)*q++ & 0x3f;
                 }
                 
-                // 转换为UTF-16（小端序）
+                // 转换为UTF-16（大端序）
                 if (codepoint <= 0xffff) {
                     // 基本多文种平面
                     uint16_t utf16 = (uint16_t)codepoint;
-                    b64_buf[b64_pos++] = utf16 & 0xff;
                     b64_buf[b64_pos++] = (utf16 >> 8) & 0xff;
+                    b64_buf[b64_pos++] = utf16 & 0xff;
                 } else {
                     // 补充平面，使用代理对
                     codepoint -= 0x10000;
                     uint16_t high_surrogate = 0xd800 | ((codepoint >> 10) & 0x3ff);
                     uint16_t low_surrogate = 0xdc00 | (codepoint & 0x3ff);
-                    b64_buf[b64_pos++] = high_surrogate & 0xff;
                     b64_buf[b64_pos++] = (high_surrogate >> 8) & 0xff;
-                    b64_buf[b64_pos++] = low_surrogate & 0xff;
+                    b64_buf[b64_pos++] = high_surrogate & 0xff;
                     b64_buf[b64_pos++] = (low_surrogate >> 8) & 0xff;
+                    b64_buf[b64_pos++] = low_surrogate & 0xff;
                 }
             }
             
@@ -275,7 +275,7 @@ int utf8_to_imap_utf7(const char *utf8, char *out, size_t out_len) {
                     int bits = 0;
                     
                     for (int j = 0; j < 3 && i < b64_pos; j++) {
-                        value |= (unsigned char)b64_buf[i++] << (8 * j);
+                        value = (value << 8) | (unsigned char)b64_buf[i++];
                         bits += 8;
                     }
                     

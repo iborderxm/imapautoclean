@@ -95,7 +95,7 @@ static int check_response(tls_context_t *tls_ctx, const char *tag) {
                 return ERR_OK;
             } else {
                 // NO或BAD响应
-                return ERR_AUTH;
+                return ERR_SELECT;
             }
         }
     }
