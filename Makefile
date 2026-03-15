@@ -4,9 +4,9 @@
 
 # ==================== 交叉编译器配置 ====================
 # 根据实际环境调整交叉编译器路径
-CC = mipsel-openwrt-linux-gcc
-STRIP = mipsel-openwrt-linux-strip
-SIZE = mipsel-openwrt-linux-size
+CC = mipsel-linux-gcc
+STRIP = mipsel-linux-strip
+SIZE = mipsel-linux-size
 
 # ==================== 目标与源文件 ====================
 TARGET = imap_cleaner
@@ -79,7 +79,7 @@ analyze: $(TARGET)
 	$(SIZE) -A -x $@
 	@echo ""
 	@echo "=== 符号大小排序（前20个） ==="
-	mipsel-openwrt-linux-nm --print-size --size-sort $@ | tail -20
+	mipsel-linux-nm --print-size --size-sort $@ | tail -20
 	@echo "====================="
 
 .PHONY: all clean install analyze

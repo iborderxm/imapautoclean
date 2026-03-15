@@ -227,7 +227,7 @@ CFLAGS += -mno-shared           # 优先静态链接内部代码
 #### 4.3 编译链接配置
 ```makefile
 # Makefile 链接配置
-CC = mipsel-openwrt-linux-gcc
+CC = mipsel-linux-gcc
 
 # 编译选项
 CFLAGS = -Os -s -mips32 -fno-stack-protector -fomit-frame-pointer \
@@ -518,9 +518,9 @@ int check_resume_state(void) {
 # MIPSel IMAP Cleaner Makefile
 
 # 交叉编译器
-CC = mipsel-openwrt-linux-gcc
-STRIP = mipsel-openwrt-linux-strip
-SIZE = mipsel-openwrt-linux-size
+CC = mipsel-linux-gcc
+STRIP = mipsel-linux-strip
+SIZE = mipsel-linux-size
 
 # 目标
 TARGET = imap_cleaner
@@ -578,7 +578,7 @@ install: $(TARGET)
 # 分析体积
 analyze: $(TARGET)
 	$(SIZE) -A -x $@
-	mipsel-openwrt-linux-nm --print-size --size-sort $@ | tail -20
+	mipsel-linux-nm --print-size --size-sort $@ | tail -20
 
 .PHONY: all clean install analyze
 ```
@@ -608,7 +608,7 @@ done
 
 # 二进制体积检查
 ls -lh imap_cleaner
-mipsel-openwrt-linux-size imap_cleaner
+mipsel-linux-size imap_cleaner
 ```
 
 #### 9.3 边界测试
