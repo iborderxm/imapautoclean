@@ -3,9 +3,14 @@
 # 用于MIPSel架构资源受限设备
 
 # ==================== 交叉编译器配置 ====================
-CC ?= ${CROSS_COMPILE}gcc
-STRIP ?= ${CROSS_COMPILE}strip
-SIZE ?= ${CROSS_COMPILE}size
+ifneq ($(CROSS_COMPILE),)
+CC := $(CROSS_COMPILE)gcc
+STRIP := $(CROSS_COMPILE)strip
+SIZE := $(CROSS_COMPILE)size
+else
+# 退出编译
+$(error "CROSS_COMPILE 未定义，请设置交叉编译工具链")
+endif
 
 # ==================== 目标与源文件 ====================
 TARGET := imap_cleaner
