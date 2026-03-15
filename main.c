@@ -137,16 +137,14 @@ int main(int argc, char *argv[]) {
     char before_date[32];
     int total_found = 0;
     
-    // 10086 日志：程序启动
-    printf("[10086] 程序启动，参数数量: %d\n", argc);
+    printf("程序启动，参数数量: %d\n", argc);
     
     // ==================== 1. 解析参数 ====================
     if (parse_args(argc, argv, &cfg) != 0) {
         return 1;
     }
     
-    // 10086 日志：参数解析成功
-    printf("[10086] 参数解析成功: 服务器=%s, 端口=%d, 用户=%s, 文件夹=%s, 保留天数=%d\n", 
+    printf("参数解析成功: 服务器=%s, 端口=%d, 用户=%s, 文件夹=%s, 保留天数=%d\n", 
            cfg.server, cfg.port, cfg.username, cfg.folder, cfg.keep_days);
     
     // ==================== 2. 初始化临时文件管理器 ====================
@@ -195,10 +193,8 @@ int main(int argc, char *argv[]) {
     printf("文件夹选择成功\n");
     
     // ==================== 6. 搜索UID ====================
-    // 10086 日志：开始搜索邮件
     const char *keyword = cfg.has_keyword ? cfg.keyword : NULL;
-    printf("[10086] 开始搜索邮件，日期: %s, 关键词: %s\n", before_date, keyword ? keyword : "无");
-    printf("正在搜索符合条件的邮件...\n");
+    printf("开始搜索邮件，日期: %s, 关键词: %s\n", before_date, keyword ? keyword : "无");
     total_found = imap_search_uids(&tls_ctx, before_date, keyword, on_search_uid, NULL);
     if (total_found < 0) {
         fprintf(stderr, "搜索失败\n");
@@ -230,9 +226,7 @@ int main(int argc, char *argv[]) {
     }
     
     // ==================== 7. 批量删除 ====================
-    // 10086 日志：开始批量删除
-    printf("[10086] 开始批量删除，共 %d 个批次\n", get_batch_count());
-    printf("开始删除邮件...\n");
+    printf("开始批量删除，共 %d 个批次\n", get_batch_count());
     
     int batch_count = get_batch_count();
     for (int i = 0; i < batch_count; i++) {
@@ -241,8 +235,6 @@ int main(int argc, char *argv[]) {
             continue;
         }
         
-        // 10086 日志：处理批次文件
-        printf("[10086] 处理批次文件: %s\n", batch_file);
         uid_batch_t batch;
         int uid_count = read_and_delete_batch(batch_file, &batch);
         if (uid_count <= 0) {
@@ -276,9 +268,7 @@ int main(int argc, char *argv[]) {
     }
     
     // ==================== 8. 登出并关闭连接 ====================
-    // 10086 日志：开始登出
-    printf("[10086] 开始登出并关闭连接\n");
-    printf("正在登出...\n");
+    printf("开始登出并关闭连接\n");
     imap_logout(&tls_ctx);
     tls_close(&tls_ctx);
     

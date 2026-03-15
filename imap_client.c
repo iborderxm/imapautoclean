@@ -88,8 +88,7 @@ static int check_response(tls_context_t *tls_ctx, const char *tag) {
             return ERR_NETWORK;
         }
         
-        // 10086 日志：服务器响应
-        printf("[10086] IMAP: 服务器响应: %s\n", g_line_buf);
+        printf("IMAP: 服务器响应: %s\n", g_line_buf);
         
         // 检查是否是标签响应行
         if (strncmp(g_line_buf, tag, tag_len) == 0 && g_line_buf[tag_len] == ' ') {
@@ -197,7 +196,7 @@ int imap_connect_and_auth(tls_context_t *tls_ctx, const config_t *cfg) {
         ret = check_response(tls_ctx, tag);
         if (ret != ERR_OK) {
             // ID命令失败不影响后续操作，继续执行
-            printf("[10086] IMAP: ID命令响应失败，错误码: %d\n", ret);
+            printf("IMAP: ID命令响应失败，错误码: %d\n", ret);
         }
     }
     
@@ -210,41 +209,32 @@ int imap_select_folder(tls_context_t *tls_ctx, const char *folder) {
     char tag[16];
     char encoded_folder[MAX_FOLDER_LEN * 2]; // 为编码后的数据预留足够空间
     
-    // 10086 日志：开始选择文件夹
-    printf("[10086] IMAP: 开始选择文件夹，原始名称: %s\n", folder);
+    printf("IMAP: 开始选择文件夹，原始名称: %s\n", folder);
     
     // 将文件夹名称转换为IMAP UTF-7格式
     if (utf8_to_imap_utf7(folder, encoded_folder, sizeof(encoded_folder)) != 0) {
-        // 10086 日志：编码失败
-        fprintf(stderr, "[10086] IMAP: 文件夹名称编码失败\n");
+        fprintf(stderr, "IMAP: 文件夹名称编码失败\n");
         return ERR_PARAM;
     }
     
-    // 10086 日志：编码后的文件夹名称
-    printf("[10086] IMAP: 编码后的文件夹名称: %s\n", encoded_folder);
+    printf("IMAP: 编码后的文件夹名称: %s\n", encoded_folder);
     
     next_tag(tag, sizeof(tag));
     snprintf(g_cmd_buf, sizeof(g_cmd_buf), "%s SELECT \"%s\"\r\n", tag, encoded_folder);
     
-    // 10086 日志：发送SELECT命令
-    printf("[10086] IMAP: 发送命令: %s", g_cmd_buf);
+    printf("IMAP: 发送命令: %s", g_cmd_buf);
     
     ret = send_command(tls_ctx, g_cmd_buf);
     if (ret != ERR_OK) {
-        // 10086 日志：发送命令失败
-        fprintf(stderr, "[10086] IMAP: 发送命令失败，错误码: %d\n", ret);
+        fprintf(stderr, "IMAP: 发送命令失败，错误码: %d\n", ret);
         return ret;
     }
     
     ret = check_response(tls_ctx, tag);
     if (ret != ERR_OK) {
-        // 10086 日志：响应失败
-        fprintf(stderr, "[10086] IMAP: 服务器响应失败，错误码: %d\n", ret);
+        fprintf(stderr, "IMAP: 服务器响应失败，错误码: %d\n", ret);
         return ERR_SELECT;
     }
-    
-    // 10086 日志：选择文件夹成功
-    printf("[10086] IMAP: 选择文件夹成功\n");
     
     return ERR_OK;
 }
@@ -400,27 +390,23 @@ int imap_list_folders(tls_context_t *tls_ctx) {
     int ret;
     char tag[16];
     
-    // 10086 日志：开始列出文件夹
-    printf("[10086] IMAP: 开始列出所有文件夹\n");
+    printf("IMAP: 开始列出所有文件夹\n");
     
     next_tag(tag, sizeof(tag));
     snprintf(g_cmd_buf, sizeof(g_cmd_buf), "%s LIST \"\" \"*\"\r\n", tag);
     
-    // 10086 日志：发送LIST命令
-    printf("[10086] IMAP: 发送命令: %s", g_cmd_buf);
+    printf("IMAP: 发送命令: %s", g_cmd_buf);
     
     ret = send_command(tls_ctx, g_cmd_buf);
     if (ret != ERR_OK) {
-        // 10086 日志：发送命令失败
-        fprintf(stderr, "[10086] IMAP: 发送LIST命令失败，错误码: %d\n", ret);
+        fprintf(stderr, "IMAP: 发送LIST命令失败，错误码: %d\n", ret);
         return ret;
     }
     
     size_t tag_len = strlen(tag);
     bool done = false;
     
-    // 10086 日志：开始接收文件夹列表
-    printf("[10086] IMAP: 开始接收文件夹列表\n");
+    printf("IMAP: 开始接收文件夹列表\n");
     
     while (!done) {
         ret = read_line(tls_ctx, g_line_buf, sizeof(g_line_buf));
@@ -428,8 +414,7 @@ int imap_list_folders(tls_context_t *tls_ctx) {
             return ERR_NETWORK;
         }
         
-        // 10086 日志：服务器响应
-        printf("[10086] IMAP: 服务器响应: %s\n", g_line_buf);
+        printf("IMAP: 服务器响应: %s\n", g_line_buf);
         
         // 检查是否是LIST响应行（格式: * LIST (...) "folder"）
         if (strncmp(g_line_buf, "* LIST", 6) == 0) {
@@ -440,8 +425,7 @@ int imap_list_folders(tls_context_t *tls_ctx) {
                 char *folder_end = strchr(folder_start, '"');
                 if (folder_end) {
                     *folder_end = '\0';
-                    // 10086 日志：找到文件夹
-                    printf("[10086] IMAP: 找到文件夹: %s\n", folder_start);
+                    printf("IMAP: 找到文件夹: %s\n", folder_start);
                 }
             }
         }
@@ -450,12 +434,10 @@ int imap_list_folders(tls_context_t *tls_ctx) {
         if (strncmp(g_line_buf, tag, tag_len) == 0 && g_line_buf[tag_len] == ' ') {
             // 检查是否是OK响应
             if (strstr(g_line_buf, "OK") != NULL) {
-                // 10086 日志：列出文件夹成功
-                printf("[10086] IMAP: 列出文件夹成功\n");
+                printf("IMAP: 列出文件夹成功\n");
                 return ERR_OK;
             } else {
-                // 10086 日志：列出文件夹失败
-                fprintf(stderr, "[10086] IMAP: 列出文件夹失败\n");
+                fprintf(stderr, "IMAP: 列出文件夹失败\n");
                 return ERR_SELECT;
             }
         }
