@@ -191,21 +191,41 @@ int imap_select_folder(tls_context_t *tls_ctx, const char *folder) {
     char tag[16];
     char encoded_folder[MAX_FOLDER_LEN * 2]; // 为编码后的数据预留足够空间
     
+    // 10086 日志：开始选择文件夹
+    printf("[10086] IMAP: 开始选择文件夹，原始名称: %s\n", folder);
+    
     // 将文件夹名称转换为IMAP UTF-7格式
     if (utf8_to_imap_utf7(folder, encoded_folder, sizeof(encoded_folder)) != 0) {
+        // 10086 日志：编码失败
+        fprintf(stderr, "[10086] IMAP: 文件夹名称编码失败\n");
         return ERR_PARAM;
     }
     
+    // 10086 日志：编码后的文件夹名称
+    printf("[10086] IMAP: 编码后的文件夹名称: %s\n", encoded_folder);
+    
     next_tag(tag, sizeof(tag));
     snprintf(g_cmd_buf, sizeof(g_cmd_buf), "%s SELECT \"%s\"\r\n", tag, encoded_folder);
+    
+    // 10086 日志：发送SELECT命令
+    printf("[10086] IMAP: 发送命令: %s", g_cmd_buf);
+    
     ret = send_command(tls_ctx, g_cmd_buf);
     if (ret != ERR_OK) {
+        // 10086 日志：发送命令失败
+        fprintf(stderr, "[10086] IMAP: 发送命令失败，错误码: %d\n", ret);
         return ret;
     }
+    
     ret = check_response(tls_ctx, tag);
     if (ret != ERR_OK) {
+        // 10086 日志：响应失败
+        fprintf(stderr, "[10086] IMAP: 服务器响应失败，错误码: %d\n", ret);
         return ERR_SELECT;
     }
+    
+    // 10086 日志：选择文件夹成功
+    printf("[10086] IMAP: 选择文件夹成功\n");
     
     return ERR_OK;
 }
