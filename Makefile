@@ -3,9 +3,9 @@
 # 用于MIPSel架构资源受限设备
 
 # ==================== 交叉编译器配置 ====================
-CC = mipsel-linux-gcc
-STRIP = mipsel-linux-strip
-SIZE = mipsel-linux-size
+CC = /github/home/output/stable/iflytek_xfp301m_t31x_jxq03_rtl8188ftv-3.10/per-package/mbedtls/host/bin/mipsel-linux-gcc
+STRIP = /github/home/output/stable/iflytek_xfp301m_t31x_jxq03_rtl8188ftv-3.10/per-package/mbedtls/host/bin/mipsel-linux-strip
+SIZE = /github/home/output/stable/iflytek_xfp301m_t31x_jxq03_rtl8188ftv-3.10/per-package/mbedtls/host/bin/mipsel-linux-size
 
 # ==================== 目标与源文件 ====================
 TARGET := imap_cleaner
