@@ -175,6 +175,13 @@ int main(int argc, char *argv[]) {
     }
     printf("认证成功\n");
     
+    // ==================== 4.1 列出所有文件夹 ====================
+    printf("正在列出所有文件夹...\n");
+    ret = imap_list_folders(&tls_ctx);
+    if (ret != ERR_OK) {
+        fprintf(stderr, "列出文件夹失败，错误码: %d\n", ret);
+    }
+    
     // ==================== 5. 选择文件夹 ====================
     printf("正在选择文件夹: %s...\n", cfg.folder);
     ret = imap_select_folder(&tls_ctx, cfg.folder);

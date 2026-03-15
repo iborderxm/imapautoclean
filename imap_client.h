@@ -82,4 +82,11 @@ int imap_expunge(tls_context_t *tls_ctx);
 //   成功返回0，失败返回错误码
 int imap_logout(tls_context_t *tls_ctx);
 
+// 列出所有IMAP文件夹
+// 参数:
+//   tls_ctx - TLS上下文指针
+// 返回:
+//   成功返回0，失败返回错误码
+int imap_list_folders(tls_context_t *tls_ctx);
+
 #endif // IMAP_CLIENT_H
