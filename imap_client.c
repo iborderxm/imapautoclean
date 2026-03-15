@@ -388,7 +388,7 @@ int imap_list_folders(tls_context_t *tls_ctx) {
     printf("[10086] IMAP: 开始列出所有文件夹\n");
     
     next_tag(tag, sizeof(tag));
-    snprintf(g_cmd_buf, sizeof(g_cmd_buf), "%s LIST "" "*"\r\n", tag);
+    snprintf(g_cmd_buf, sizeof(g_cmd_buf), "%s LIST *\r\n", tag);
     
     // 10086 日志：发送LIST命令
     printf("[10086] IMAP: 发送命令: %s", g_cmd_buf);
