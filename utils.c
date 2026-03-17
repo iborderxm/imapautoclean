@@ -300,3 +300,30 @@ int utf8_to_imap_utf7(const char *utf8, char *out, size_t out_len) {
     out[pos] = '\0';
     return 0;
 }
+
+// 转义IMAP字符串中的特殊字符（引号和反斜杠）
+int imap_escape_string(const char *input, char *out, size_t out_len) {
+    if (!input || !out) {
+        return -1;
+    }
+    
+    size_t pos = 0;
+    const char *p = input;
+    
+    while (*p && pos < out_len - 1) {
+        if (*p == '"' || *p == '\\') {
+            // 转义引号和反斜杠
+            if (pos + 2 >= out_len) {
+                return -1;
+            }
+            out[pos++] = '\\';
+            out[pos++] = *p;
+        } else {
+            out[pos++] = *p;
+        }
+        p++;
+    }
+    
+    out[pos] = '\0';
+    return 0;
+}

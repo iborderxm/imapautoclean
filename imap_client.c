@@ -246,14 +246,20 @@ int imap_search_uids(tls_context_t *tls_ctx, const char *before_date,
     char tag[16];
     int uid_count = 0;
     size_t tag_len;
+    char escaped_keyword[MAX_KEYWORD_LEN * 2]; // 为转义后的数据预留足够空间
     
     // ==================== 1. 构建SEARCH命令 ====================
     next_tag(tag, sizeof(tag));
     if (keyword && keyword[0] != '\0') {
         // 有关键词：搜索日期前且标题包含关键词
+        // 转义特殊字符
+        if (imap_escape_string(keyword, escaped_keyword, sizeof(escaped_keyword)) != 0) {
+            return -1;
+        }
+        // 使用CHARSET UTF-8以支持中文等非ASCII字符
         snprintf(g_cmd_buf, sizeof(g_cmd_buf), 
-                 "%s UID SEARCH BEFORE \"%s\" SUBJECT \"%s\"\r\n", 
-                 tag, before_date, keyword);
+                 "%s UID SEARCH CHARSET UTF-8 BEFORE \"%s\" TEXT \"%s\"\r\n", 
+                 tag, before_date, escaped_keyword);
     } else {
         // 无关键词：仅搜索日期前
         snprintf(g_cmd_buf, sizeof(g_cmd_buf), 

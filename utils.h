@@ -77,4 +77,13 @@ void reset_batch_count(void);
 //   成功返回0，失败返回-1
 int utf8_to_imap_utf7(const char *utf8, char *out, size_t out_len);
 
+// 转义IMAP字符串中的特殊字符（引号和反斜杠）
+// 参数:
+//   input - 输入字符串
+//   out - 输出缓冲区
+//   out_len - 输出缓冲区大小
+// 返回:
+//   成功返回0，失败返回-1
+int imap_escape_string(const char *input, char *out, size_t out_len);
+
 #endif // UTILS_H
